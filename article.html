@@ -1,0 +1,308 @@
+Создаем калькулятор на Swift 5
+Всем привет! Прошло уже больше года с того момента, как появился релиз Swift 5, который принес разработчикам много нового. В этой статье я хочу поговорить о мобильной разработке для IOS, как она устроена, что для этого нужно, и о многом другом.
+<cut />
+<h4> Требования к железу</h4>
+ Так или иначе, для того, чтобы забилидить приложение для IOS любой версии, вам потребуется компьютер под операционной системой Mac OS (и желательно последней версии, иначе какая-то часть инструментов разработчика и XCode может начать работать совершенно непредсказуемо). Необходимость именно системы под управлением Mac OS служит причиной споров и ненависти со стороны других разработчиков, которые не привыкли быть ограничены в своих возможностях из-за операционной системы. Чаще всего есть несколько путей: покупка или сборка Хакинтоша (однако в случай самостоятельной сборки я хочу вас предупредить, что собрать такой компьютер без постоянной проблемы с драйверами будет непросто). Я видел и установки образа операционной системы в виртуальную машину, и накатывание Mac OS на обычый ноутбук, без каких-либо проблем с драйверами. Однако этот путь потребует от вас некоторых навыков в железе, а грозит отсутствием 100% поддержки будущих версий Mac OS.
+ Альтернативный путь, понятное дело - это покупка компьютера изначально от Apple. Если вы хотели ноутбук, то вы наверное знаете что делать(но я хочу вас сразу предупредить, что Xcode сходу легко занимает около 25 гигабайт, и он может без проблем занять и все 44 гигабайта, если скачиваете дополнительные симуляторы на устройства. Так что устройства с размером 128 гигабайт должны быть только на IOS разработку без всяких дополнительных штук типа node_modules, кеша Pycharm и Unity, homebrew, и прочего стафа для разрабов, который занимает тонну места на диске. Если вы собираетесь заниматься чем-то еще, вам понадобится диск как минимум от 256 гигабайт, или больше). 
+
+ <h4> Требования к среде разработки </h4>
+ Кроме более-менее классического способа разработка приложений на Xcode c использованием Swift и использования библиотек Cocoa и CocoaTouch, сейчас уже масса других способов разработки почти без использования Xcode (только без Xcode вам уже не забилдить приложение). Существует несколько технологий:
+ <ul>
+ 	<li> Xamarin. Приложения на этой плафторме пишутся с помощью С#. С помощью Xamarin можно создать какое-либо нативное приложение для Android, либо для IOS. Разработку можно вести при помощи Visual Studio. Несмотя на такие преимущества, скорее всего, некоторые фрагменты приложений нужно будет писать отдельно для каждой платформы</li>
+ 	<li>React Native. Производное от библиотеки React может привлечь разработчиков, которые имеют бекграунд во фронтенд разработке. На нем также можно разрабатывать сразу на обе платформы. Я на нем не писал, кто-то говорит очень просто, кто-то что очень сложно. Но попробовать тоже можно, я думаю
+ 	</li>
+ 	<li> Flutter. Пока не настолько известный, Flutter позволяет разрабатывать мобильные приложения на новом языке программирования Dart от компании Google. Если предыдущие решения вам были не по душе, можно воспользоваться этим решением, на котором тоже можно делать кроссплафторменные приложения</li>
+ 	<li> PhoneGap/Cordova. Изначально созданный компанией Nitobi, впоследствии был куплен корпорацией Adobe. Я не буду особенно на нем останавливаться, потому как PhoneGap, как и Apache Cordova, в итоге в приложениях использует WebView, который не очень хорошо влияет на производительность приложений</li>
+    <li> Unity. Это тоже путь разработки приложения для IOS, на самом деле. Правда на нем в основном пишутся игры, но можно и писать приложения с интерфейсами. Вариант если у вас есть опыт в gamedev</li>
+ </ul>
+
+ <h3> Языки программирования </h3>
+  Корпорация Apple рекомендует использовать для разработки приложений язык программирования Swift. Swift относительно новый язык программирования, который был официально выпущен только в 2014 году. Он может быть использован для разработки для Mac OS, IOS, а также есть поддержка на Linux (поэтому, если у вас, скажем так, не слишком специфический Linux, вы смело можете скачать и попробовать язык, например по <a href="https://swift.org/download/#releases"> этой</a> ссылке).
+ Сам язык Swift представляет из себя типичный язык нового поколения, типо Golang. Изначально язык задумывался как более легкий для чтения и устойчивый к ошибкам программиста язык, нежели Objective C. В тоже время Swift может работать в рамках одного проекта как с Си, так и с Objective C. 
+ Вместо того, чтобы пытаться приводить описание этого языка (который на первый взгляд представляет из себя C++, просто доработанный до современных реалий с модной функцией автоматической типизации), я предлагаю читателю изучить очень приятную документацию от корпорации Apple, в которой подробно рассказано, как устроен язык и каков его синтаксис. Англоязычную версию можно найти <a href="https://swiftbook.ru/contents/doc/">здесь</a>, русскоязычный перевод можно найти <a href="https://swift.org/documentation/">здесь</a>. После того, как вы ознакомитесь с основами языка Swift, мы можем переходить к тому, ради чего мы здесь сегодня собрались - созданию нашего несложного калькулятора с помощью Xcode.
+
+ <h3> Создание калькулятора</h3>
+ Для создания приложения нам потребуется Xcode, который можно бесплатно загрузить из AppStore (он сразу займет около 22 гигабайтов, после того, как распакует и установит свои пакеты). Не стоит пугаться его рейтинга - несмотря на то, что первые пять отзывов ставят 1 звезду, это не означает, что вас ждет шок. Возможно, и правда синтаксис и подсказки включаются не слишком быстро при редактировании - но в целом Xcode оставил у меня в разы более благоприятные впечатления, чем тот же Android Studio (хотя возможно я просто не умею его готовить). Если у вас вдруг есть желание попробовать разработку не в Xcode, и вы предпочитаете продукцию компании JetBrains, то вы можете попробовать AppCode - он поддерживает функциональную совместимость с Xcode, работу со Swift и Objective C, и множество других приятных фич. Я лично его не пробовал, но если у вас есть подписка на весь софт от JetBrains - почему бы и не скачать и запустить. 
+ Итого, положим, у вас установлен Xcode. Теперь вы можете начать разработку. Запускаете новый проект и выбираете Single Page Application:
+<img src="https://habrastorage.org/webt/jk/gr/b3/jkgrb3yjnzok6_nfu_tzygev2vc.png" />
+ После этого вам предложат ввести данные о вашем приложении. Если это ваш первый запуск Xcode, там вам придется ввести Apple Id. После этого вы должны заполнить данные о названии вашего проекта (в нашем случае просто Calculator), и название вашей фирмы и приложения. Здесь вы можете написать все что угодно, если не собираетесь в будущем публиковать это приложение. В качестве языка я выбрал Swift, в качестве User Interface - Storyboard. Тесты я пока выкинул <strike>потому что я молодец</strike>, потому что тестировать здесь пока толком нечего. 
+<img src="https://habrastorage.org/webt/lc/_s/e6/lc_se60eozst27twutldrl82-w0.png" />
+ После того, как мы создали наше приложение, вы можете зайти в файл в Calculator.xcodeproj и поправить какие-либо настройки, если сочтете это нужным. Я пока оставил все как есть, разрабатываю на последнюю версию IOS 13.6 для Iphone и Ipad. Ipad в принципе можете пока исключить - на нем наш интерфейс скорее всего будет смотреться не очень хорошо. Однако хочу вас предупредить, что если вдруг вы будете публиковаться - работники Apple на проверке тестируют и приложения для Iphone, чтобы они были хотя бы функциональны на Ipad. Но до этого вам еще придется потратить 99 долларов на ключи разработчика)
+ После того, как вы создали приложение, вы можете сразу вызвать эмулятор для того, чтобы отслеживать, что у вас получается. Для этого можете просто нажать сочетание клавиш CMD + R. Слева вверху вы можете выбирать устройства, на которых вы запускаете эмулятор, а также можете через кабель подключить ваше настоящее физическое устройство и тестировать сразу же на нем).
+ Существует много способов создания интерфейса и виджетов в нем, и я воспользуюсь нейтральным вариантом - создам основной holder, размещу его на весь экран, а потом программно начну располагать свои виджеты. Поэтому сначала мы переходим в файл Main.storyboard и делаем основной View черным, для того, чтобы удобнее размещать наши элементы:
+<img src="https://habrastorage.org/webt/_e/9_/4b/_e9_4b5hacq0ymxmewnuj47o_qo.png" />
+ После этого мы добавим View, с которым в основном и будем работать. Для этого кликаем на плюсик справу сверху, через который можно добавлять виджеты, и добавляем новый виджет, наберем в поиске uiview:
+<img src="https://habrastorage.org/webt/rd/sx/u6/rdsxu6ltpzhj_is0fq9nviccqie.png" />
+После этого мы перетаскиваем этот виджет на основной экран, и нам нужно расширить его на весь экран. Для этого нам нужно поработать с constaint. Для этого щелкаем по значку слева внизу, который немного похож на кораблик Дарта Вейдера и назначить 0 с каждой из сторон:
+<img src="https://habrastorage.org/webt/k9/dh/xy/k9dhxywksbig-2jz1q_20-vtmzi.png" />
+После этого ваш новый виджет расшириться до размеров всего экрана. Дальше нам нужно также, как и в прошлый раз, поменять цвет нашего виджета, только теперь на Clear Color, чтобы он нам не мешался и мы могли размещать виджеты в нем.
+Теперь мы можем переходить в файл ViewController.swift, в котором у нас и будет происходить все остальное программирование. Для начала нам нужно использовать специальный маркер @IBOutlet для того, чтобы иметь возможность связать Storyboard c нашим кодом. Для этого мы должны написать следующую строчку:
+<source lang="swift">
+@IBOutlet var holder: UIView!
+</source>
+Теперь мы можем связать наш код с виджетом. Для этого, по сути,  нам нужно соединить наш holder c Holder. Для этого щелкаем правой кнопкой по viewController и перетягиваем holder на наш экран:
+<img src="https://habrastorage.org/webt/bp/yh/wz/bpyhwz0f7vj1mqcd4w_xp-ynnjq.png" />
+После этого мы наконец-то закончили связывание нашего кода с Storyboard и может заняться именно программированием. 
+Далее мы добавим две переменные, первая из которых будет просто числом, в которое можно записывать первое значение, и вторая - результирующее значение. Третья переменная будет несколько более специфическая, потому что мы будем использовать optional объявление (почитать, чтоже это за зверь, можно подробнее <a href="https://developer.apple.com/documentation/swift/optional">здесь</a>). Optional может содержать какое-либо значение или nil. Также опционалы гарантируют, что значения nil будут явно обработаны. Кроме того, мы добавим с самого начала перечисление математических операций, которые калькулятор поддерживает:
+ <source lang = 'swift'>
+    var firstNumber = 0
+    var resultNumber = 0
+    var currentOperations: Operation?
+        enum Operation {
+        case add, subtract, multiply, divide
+    }
+</source>
+Далее нам предстоит создать Label, в который мы будем показывать цифры и результат наших вычислений. По умолчанию там будет стоять 0 и достаточно большой шрифт. Все остальное, я думаю, совершенно понятно:
+<source lang="swift">
+    private var resultLabel: UILabel = {
+        let label = UILabel()
+        label.text = "0"
+        label.textColor = .white
+        label.textAlignment = .right
+        label.font = UIFont(name: "Helvetica", size: 100)
+        return label
+    }()
+
+</source>
+После этого, пропустив встроенный метод, который вызывает у нас отрисовку (я говорю про viewDidLoad), нам нужно вызвать метод, который будет вызывать функцию, которая будет отрисовывать все наши кнопки, на которых будут висеть функции-обработчики. 
+<source lang = 'swift'>
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        setupNumberPad() //функция, которая и будет отрисовывать наши кнопки
+    }
+</source>
+После этого у нас и пойдет функция setupNumberPad. В начале я задам константу для размера нашего шрифта, для того чтобы потом, если что, можно сразу увеличить/уменьшить размер шрифта в приложении, потому что я работаю без макета. После этого я создам размер нашей кнопки - его ширина будет равна четверти размера экрана нашего приложения. 
+
+ <source lang="swift">
+    private func setupNumberPad() {
+        let FontSize:CGFloat = 25 
+        // стандартный размер шрифта в дробных числах
+        let buttonSize: CGFloat = view.frame.size.width / 4 
+        // размер кнопки в 1/4
+        let zeroButton = UIButton(frame: CGRect(x: 0, y: holder.frame.size.height-buttonSize, width: buttonSize*3, height: buttonSize))
+        // в UIButton мы задаем позицию нашей кнопки
+        zeroButton.setTitleColor(.black, for: .normal) 
+        // задаем цвет нашей кнопки
+        zeroButton.backgroundColor = .white
+        // кнопка будет белая
+        zeroButton.setTitle("0", for: .normal) 
+        // ее контент конечно 0
+        zeroButton.titleLabel?.font = UIFont(name: "Helvetica", size: FontSize)
+        // шрифт, family и размер текста 
+        zeroButton.tag = 1 
+        // по тегу мы потом будем обрабатывать нажатие на кнопку
+        holder.addSubview(zeroButton)  // добавляем в наш holder кнопку
+        zeroButton.addTarget(self, action: #selector(zeroTapped), for: .touchUpInside) 
+        // добавляем функцию обработчик и на каком событии
+ </source>
+0 у нас занимает треть экрана для того, чтобы у нас справа могли в колонку пойти математические операнды. Дальше нам нужно каким-либо образом отрисовать все наши кнопки. Конечно, можно было бы их отрисовывать поодиночке, но это тогда получится долго и муторно. Т.к. у нас будет просто ряд цифр от 1 до 9, то вполне на поверхности лежит решение воспользоваться циклами. Я приведу первый цикл с комментариями, а т.к. два остальных по сути повторение, я приведу их просто под катом:
+<source lang="swift">
+        for x in 0..<3 {
+            let button_row_1 = UIButton(frame: CGRect(x: buttonSize * CGFloat(x), y: holder.frame.size.height-(buttonSize*2), width: buttonSize, height: buttonSize))
+            //будем использовать наш x и для положения по x
+            button_row_1.setTitleColor(.black, for: .normal) //цвет
+            button_row_1.backgroundColor = .white //задний цвет
+            button_row_1.setTitle("\(x+1)", for: .normal) // задаем содержание
+            holder.addSubview(button_row_1) // добавляем в наш вид
+            button_row_1.tag = x+2 // т.к.тег 1 уже занят, добавляем по 2
+            button_row_1.addTarget(self, action: #selector(numberPressed(_:)), for: .touchUpInside)
+            //добавляем обработчик
+        }
+</source>
+<spoiler title = "Остальной код наших цифр"> 
+
+<source lang='swift'>
+       for x in 0..<3 {
+            let button_row_2 = UIButton(frame: CGRect(x: buttonSize * CGFloat(x), y: holder.frame.size.height-(buttonSize*3), width: buttonSize, height: buttonSize))
+            button_row_2.setTitleColor(.black, for: .normal)
+            button_row_2.backgroundColor = .white
+            button_row_2.setTitle("\(x+4)", for: .normal)
+            button_row_2.addSubview(button_row_2)
+            button_row_2.tag = x+5
+            button_row_2.addTarget(self, action: #selector(numberPressed(_:)), for: .touchUpInside)
+        }
+        
+        for x in 0..<3 {
+            let button_row_3 = UIButton(frame: CGRect(x: buttonSize * CGFloat(x), y: holder.frame.size.height-(buttonSize*4), width: buttonSize, height: buttonSize))
+            button_row_3.setTitleColor(.black, for: .normal)
+            button_row_3.backgroundColor = .white
+            button_row_3.setTitle("\(x+7)", for: .normal)
+            holder.addSubview(button_row_3)
+            button_row_3.tag = x+8
+            button_row_3.addTarget(self, action: #selector(numberPressed(_:)), for: .touchUpInside)
+        }
+    </source>
+</spoiler>
+После этого нам нужно разместить нашу кнопку CE, на которую у нас будет осуществляться сброс данных, которые были введены. Мы разместим ее наверху, и ее функциональную нагрузку мы опишем немного позднее. Пока нам нужно только ее расположить и подключить обработчики:
+<source lang="swift">
+        let clearButton = UIButton(frame: CGRect(x: 0, y: holder.frame.size.height-(buttonSize*5), width: view.frame.size.width - buttonSize, height: buttonSize))
+        clearButton.setTitleColor(.black, for: .normal)
+        clearButton.backgroundColor = .init(red: 0, green: 2, blue: 0.8, alpha: 1) // здесь я задаю цвета с помощью rgb
+         clearButton.titleLabel?.font = UIFont(name: "Helvetica", size: FontSize-4) //хочу кнопку СЕ довольно большого размера
+        clearButton.setTitle("CE", for: .normal)
+        holder.addSubview(clearButton) // добавляем кнопку в наш holder
+        clearButton.addTarget(self, action: #selector(clearResult), for: .touchUpInside) //добавляем функцию обработчик
+</source>
+ Мы закончили с этой скучной повторяющейся частью, теперь готовы к другой штуке - нашим операндам, при помощи которых можно будет осуществлять математические операции. Начнем с того, что необходимые операнды мы поместим внутрь массива, откуда их будем забирать. Сами кнопки операндов мы расположим в колоночку и добавим функцию обработчик, который будет реагировать на нажатия наших операндов. Кнопки я сделаю приятного <strike> цвета детской неожиданности </strike> желого цвета, и размер немного покрупнее, чем у наших цифр. 
+ <source lang='swift'>
+        let operations = ["=","+", "-", "x", "÷"] //массив наших операндов
+
+        for x in 0..<5 {
+            let button_operand = UIButton(frame: CGRect(x: buttonSize * 3, y: holder.frame.size.height-(buttonSize * CGFloat(x+1)), width: buttonSize, height: buttonSize))
+            button_operand.setTitleColor(.black, for: .normal)
+            button_operand.backgroundColor = .init(red: 2, green: 0.8, blue: 0, alpha: 1) //желтый цвет
+            button_operand.setTitle(operations[x], for: .normal)
+            holder.addSubview(button_operand)
+            button_operand.tag = x+1 
+            //добавляем тэги, чтобы потом можно было на них ориентироватьсят
+            button_operand.titleLabel?.font = UIFont(name: "Helvetica", size: FontSize)
+            button_operand.addTarget(self, action: #selector(operationPressed(_:)), for: .touchUpInside)
+        }
+</source>
+После этих глобальных операций нам осталось только расположить наш Label, в который мы будем записывать результат, и закрыть нашу функцию:
+<source lang="swift">
+    resultLabel.frame = CGRect(x: 20, y: clearButton.frame.origin.y - 110.0, width: view.frame.size.width - 40, height: 100)
+    holder.addSubview(resultLabel)
+} // закрываю тут нашу функцию
+</source> 
+Теперь можно двигаться к обработчикам:
+ <h3> Работа с обработчиками </h3>
+Это все была по сути только верстка, теперь нам предстоит вдохнуть логику в наше приложение. Для этого мы с вами воспользуемся методами из runtime Objective C, чтобы упростить наш код. Если вы не понимаете, что происходит, могу вам порекомендовать <a href="https://habr.com/ru/post/345946/"> эту</a> статью для чтения. 
+Итого, вот наши функции:
+<source lang="swift">
+    @objc func clearResult() {
+        resultLabel.text = "0" //на очищении даем значение 0
+        currentOperations = nil // обнуляем наши текущие операции
+        firstNumber = 0 // первое число у нас становится 0
+    }
+    
+    @objc func zeroTapped() {
+        // отдельная функция дл нуля
+        if resultLabel.text != "0" {
+            if let text = resultLabel.text {
+                resultLabel.text = "\(text)\(0)" // используем интерполяцию
+            }
+        }
+    }
+</source>
+Дальше нам нужно добавить функцию обработчик на наши кнопки:
+<source lang="swift">
+    @objc func numberPressed(_ sender: UIButton) {
+        let tag = sender.tag - 1
+        
+        if resultLabel.text == "0" {
+            resultLabel.text = "\(tag)"
+        }
+        else if let text = resultLabel.text {
+        //красиво используем опциональное связывание
+            resultLabel.text = "\(text)\(tag)"
+        }
+    }
+
+</source>
+Дальше у нас пойдем самая важная бизнес-логика нашего приложения. Мы воспользуемся конструкцией switch для того, чтобы управлять нашими математическими операциями:
+<source lang='swift'> 
+ @objc func operationPressed(_ sender: UIButton) {
+        let tag = sender.tag
+        
+        if let text = resultLabel.text, let value = Int(text), firstNumber == 0 {
+            //тоже используем опциональное связывание
+            firstNumber = value
+            resultLabel.text = "0"
+        }
+        
+        if tag == 1 {
+            if let operation = currentOperations {
+                var secondNumber = 0
+                if let text = resultLabel.text, let value = Int(text) {
+                    secondNumber = value
+                }
+                
+                switch operation {
+                case .add:
+                    
+                    firstNumber = firstNumber + secondNumber
+                    secondNumber = 0 //обнуляем второе число
+                    resultLabel.text = "\(firstNumber)" 
+                    currentOperations = nil
+                    firstNumber = 0 //и первое после записи в Label тоже
+                    
+                    break
+                    
+                case .subtract:
+                    firstNumber = firstNumber - secondNumber
+                    secondNumber = 0
+                    resultLabel.text = "\(firstNumber)"
+                    currentOperations = nil
+                    firstNumber = 0
+                    
+                    break
+                    
+                case .multiply:
+                    firstNumber = firstNumber * secondNumber
+                    secondNumber = 0
+                    resultLabel.text = "\(firstNumber)"
+                    currentOperations = nil
+                    firstNumber = 0
+                    
+                    break
+                    
+                case .divide:
+                    firstNumber = firstNumber / secondNumber
+                    secondNumber = 0
+                    resultLabel.text = "\(firstNumber)"
+                    currentOperations = nil
+                    firstNumber = 0
+                    break
+                }
+            }
+        }
+        else if tag == 2 {
+            currentOperations = .add 
+            // назначаем операции по номер лейблов. Если будете перемещать кнопки, не забудьте поменять здесь
+        }
+        else if tag == 3 {
+            currentOperations = .subtract
+        }
+        else if tag == 4 {
+            currentOperations = .multiply
+        }
+        else if tag == 5 {
+            currentOperations = .divide
+        }
+    }
+}
+
+</source>
+На этом все! Исходный код этого приложения можно найти по <a href="https://github.com/isakura313/Calculator">этой</a> ссылке. Внешний вид у нас в итоге получился вот такой:
+<img src="https://habrastorage.org/webt/5d/5j/9l/5d5j9lduqt7j94f1q2umapkjtaa.png" />
+ По традиции, приведу несколько полезных ресурсов, которые могут быть полезны начинающему IOS - разработчику:
+<ul>
+    <li><a href="https://www.hackingwithswift.com/"> Прекрасный сайт для новичка, на котором можно найти массу ответов на распостраненные вопросы по Swift</a></li>
+    <li><a href="https://docs.swift.org/swift-book/GuidedTour/GuidedTour.html">
+       Swift Tour, классное место, если вы уже знаете программирование, и просто хотите быстро ознакомиться с языком 
+    </a></li>
+    <li><a href="https://appleinsider.ru/ios/chto-takoe-swiftui-i-zachem-on-nuzhen.html"> Немного об относительно новом и модном SwiftUI</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
